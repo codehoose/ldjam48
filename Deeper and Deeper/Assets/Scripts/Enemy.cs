@@ -4,12 +4,15 @@ public class Enemy : MonoBehaviour
 {
     public int _health = 3;
 
-    public void TakeHit()
+    public bool TakeHit()
     {
         _health--;
         if (_health == 0)
         {
             Destroy(gameObject);
+            return true;
         }
+
+        return false;
     }
 }

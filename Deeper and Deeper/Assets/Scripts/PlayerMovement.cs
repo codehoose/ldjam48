@@ -25,6 +25,8 @@ public class PlayerMovement : MonoBehaviour
 
     private Direction _direction = Direction.None;
 
+    public EnemyController _enemyController;
+
     public float _speed = 5f;
 
     [HideInInspector]
@@ -75,7 +77,8 @@ public class PlayerMovement : MonoBehaviour
         {
             _direction = Direction.None;
             // TODO: Firing
-            _enemyTarget.GetComponent<Enemy>().TakeHit();
+            _enemyController.HitEnemy(_enemyTarget);
+            _enemyTarget = null;
         }
         else
         {
@@ -120,6 +123,9 @@ public class PlayerMovement : MonoBehaviour
                     time += Time.deltaTime * _speed;
                     yield return null;
                 }
+
+                // Tell the enemy controller - This will be used to spawn enemies
+                _enemyController.PlayerMoved();
 
                 // Did we touch a tesseract?
                 if (_touchedTesseract != null)
