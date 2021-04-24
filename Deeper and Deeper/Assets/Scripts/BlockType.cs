@@ -4,5 +4,6 @@
     Chest,
     Wall,
     PlayerSpawn,
+    Tesseract,
     Exit
 }

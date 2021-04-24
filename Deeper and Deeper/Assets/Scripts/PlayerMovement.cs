@@ -13,13 +13,24 @@ public class PlayerMovement : MonoBehaviour
         Right
     }
 
+    private GameObject _touchedTesseract;
+
+    private GameObject _touchedChest;
+
+    private GameObject _enemyTarget;
+
+    private bool _exitRequested;
+
     private Dictionary<Direction, Vector3> _vectors;
 
     private Direction _direction = Direction.None;
 
     public float _speed = 5f;
 
+    [HideInInspector]
     public BlockType[] _collisions;
+
+    public int _tesseracts;
 
     void Awake()
     {
@@ -30,6 +41,30 @@ public class PlayerMovement : MonoBehaviour
         _vectors.Add(Direction.Right, Vector3.right);
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Tesseract")
+        {
+            _touchedTesseract = collision.gameObject;
+        }
+        else if (collision.tag == "Chest")
+        {
+            _touchedChest = collision.gameObject;
+        }
+        else if (collision.tag == "Exit")
+        {
+            _exitRequested = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.tag == "Chest")
+        {
+            _touchedChest = null;
+        }
+    }
+
     public IEnumerator Move()
     {
         if (_direction == Direction.None)
@@ -38,7 +73,9 @@ public class PlayerMovement : MonoBehaviour
         }
         else if (EnemyInSight())
         {
-
+            _direction = Direction.None;
+            // TODO: Firing
+            _enemyTarget.GetComponent<Enemy>().TakeHit();
         }
         else
         {
@@ -69,7 +106,7 @@ public class PlayerMovement : MonoBehaviour
             var cellX = (int)target.x;
             var cellY = (int)-target.y;
             var index = cellY * 8 + cellX;
-            if (_collisions[index] != BlockType.Walk)
+            if (_collisions[index] != BlockType.Walk && _collisions[index] != BlockType.Exit)
             {
                 target = start;
             }
@@ -82,6 +119,17 @@ public class PlayerMovement : MonoBehaviour
                     transform.position = Vector3.Lerp(start, target, time);
                     time += Time.deltaTime * _speed;
                     yield return null;
+                }
+
+                // Did we touch a tesseract?
+                if (_touchedTesseract != null)
+                {
+                    Destroy(_touchedTesseract);
+                    _touchedTesseract = null;
+                    _tesseracts++;
+                } else if (_exitRequested)
+                {
+                    print("exit!");
                 }
             }
             else
@@ -121,11 +169,35 @@ public class PlayerMovement : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             _direction = Direction.Right;
+        } else if (Input.GetKeyDown(KeyCode.Space) && _touchedChest != null && _tesseracts > 0)
+        {
+            _tesseracts--;
+            print($"{_tesseracts} left");
         }
     }
 
     private bool EnemyInSight()
     {
+        // Only ever called if direction is valid so no need to check that here
+        var dir = _vectors[_direction];
+        RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, dir, 10);
+
+        foreach (var hit in hits)
+        {
+            if (hit.collider != null)
+            {
+                if (hit.collider.tag == "Wall")
+                {
+                    return false;
+                }
+                else if (hit.collider.tag == "Enemy")
+                {
+                    _enemyTarget = hit.collider.gameObject;
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
