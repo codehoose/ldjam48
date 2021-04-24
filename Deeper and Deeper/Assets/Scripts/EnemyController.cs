@@ -12,7 +12,9 @@ public class EnemyController : MonoBehaviour
     private List<GameObject> _spawned;
     private List<EnemySpawner> _spawners;
 
-    private int _maxEnemies = 2;
+    [HideInInspector]
+    public int _maxEnemiesAtStart = 2;
+    public int _maxEnemies = 3;
     private int _playerMoveCount;
     private AStar _astar;
 
@@ -82,7 +84,7 @@ public class EnemyController : MonoBehaviour
 
     private void ShouldWeGenerateEnemy()
     {
-        if ((_playerMoveCount %= _spawnAfterMoves) == 0 && _spawned.Count < 3) // Max 4 enemies
+        if ((_playerMoveCount %= _spawnAfterMoves) == 0 && _spawned.Count < _maxEnemies)
         {
             GenerateEnemy();
         }
@@ -114,7 +116,7 @@ public class EnemyController : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        for (int i = 0; i < _maxEnemies; i++)
+        for (int i = 0; i < _maxEnemiesAtStart; i++)
         {
             GenerateEnemy();
         }

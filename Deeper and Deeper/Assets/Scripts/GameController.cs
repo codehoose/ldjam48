@@ -40,6 +40,13 @@ public class GameController : MonoBehaviour
 
     private IEnumerator ExitSequence()
     {
+        // Make it a little more difficult each level.
+        _enemyController._maxEnemies++;
+        if ((_enemyController._maxEnemies % 5) == 0)
+        {
+            _enemyController._maxEnemiesAtStart += 2;
+        }
+
         InitSequence();
 
         yield return null;
