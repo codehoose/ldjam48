@@ -155,7 +155,7 @@ public class PlayerMovement : MonoBehaviour
                     Destroy(_touchedTesseract);
                     _touchedTesseract = null;
                     _tesseracts++;
-                    _tesseracts %= 5; // Max five tesseracts
+                    _tesseracts = Mathf.Min(_tesseracts, 5); // Max five tesseracts
                 }
                 else if (_exitRequested)
                 {

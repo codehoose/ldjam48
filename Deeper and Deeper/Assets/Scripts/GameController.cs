@@ -15,6 +15,10 @@ public class GameController : MonoBehaviour
 
     public int _dungeonLevel = 1;
 
+    public TMPro.TextMeshProUGUI _level;
+
+    public GameObject[] _tesseractUI;
+
     IEnumerator Start()
     {
         InitSequence();
@@ -27,6 +31,11 @@ public class GameController : MonoBehaviour
             if (_playerMovement._doExitSequence)
             {
                 yield return ExitSequence();
+            }
+
+            for (int i = 0; i < _tesseractUI.Length; i++)
+            {
+                _tesseractUI[i].SetActive(i + 1 <= _playerMovement._tesseracts);
             }
         }
     }
@@ -43,6 +52,7 @@ public class GameController : MonoBehaviour
         }
 
         _dungeonLevel++;
+        _level.text = _dungeonLevel.ToString();
         InitSequence();
 
         yield return null;
