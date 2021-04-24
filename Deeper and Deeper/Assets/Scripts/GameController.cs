@@ -13,17 +13,11 @@ public class GameController : MonoBehaviour
 
     public bool _isRunning = true;
 
+    public int _dungeonLevel = 1;
+
     IEnumerator Start()
     {
         InitSequence();
-
-        //var map = _mapGeneration.Generate();
-        //_mapBuilder.BuildMap(map);
-        //_playerMovement._collisions = map._blocks;
-        //_playerMovement.transform.position = GetPlayerStart(map);
-
-        //_enemyController._map = map;
-        //_enemyController.GenerateEnemies();
 
         while (_isRunning)
         {
@@ -33,13 +27,14 @@ public class GameController : MonoBehaviour
             if (_playerMovement._doExitSequence)
             {
                 yield return ExitSequence();
-                // TODO: Load new map
             }
         }
     }
 
     private IEnumerator ExitSequence()
     {
+        // TODO: Exit sequence
+
         // Make it a little more difficult each level.
         _enemyController._maxEnemies++;
         if ((_enemyController._maxEnemies % 5) == 0)
@@ -47,6 +42,7 @@ public class GameController : MonoBehaviour
             _enemyController._maxEnemiesAtStart += 2;
         }
 
+        _dungeonLevel++;
         InitSequence();
 
         yield return null;
