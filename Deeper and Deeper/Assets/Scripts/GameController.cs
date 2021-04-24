@@ -15,6 +15,41 @@ public class GameController : MonoBehaviour
 
     IEnumerator Start()
     {
+        InitSequence();
+
+        //var map = _mapGeneration.Generate();
+        //_mapBuilder.BuildMap(map);
+        //_playerMovement._collisions = map._blocks;
+        //_playerMovement.transform.position = GetPlayerStart(map);
+
+        //_enemyController._map = map;
+        //_enemyController.GenerateEnemies();
+
+        while (_isRunning)
+        {
+            yield return _playerMovement.Move();
+            yield return _enemyController.Move();
+
+            if (_playerMovement._doExitSequence)
+            {
+                yield return ExitSequence();
+                // TODO: Load new map
+            }
+        }
+    }
+
+    private IEnumerator ExitSequence()
+    {
+        InitSequence();
+
+        yield return null;
+    }
+
+    private void InitSequence()
+    {
+        _enemyController.ClearEnemies();
+        _playerMovement.Reset();
+
         var map = _mapGeneration.Generate();
         _mapBuilder.BuildMap(map);
         _playerMovement._collisions = map._blocks;
@@ -22,12 +57,6 @@ public class GameController : MonoBehaviour
 
         _enemyController._map = map;
         _enemyController.GenerateEnemies();
-
-        while (_isRunning)
-        {
-            yield return _playerMovement.Move();
-            yield return _enemyController.Move();
-        }
     }
 
     private Vector3 GetPlayerStart(Map map)

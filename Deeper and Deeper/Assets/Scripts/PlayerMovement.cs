@@ -34,6 +34,22 @@ public class PlayerMovement : MonoBehaviour
 
     public int _tesseracts;
 
+    public bool _paused;
+
+    [HideInInspector]
+    public bool _doExitSequence;
+
+    public void Reset()
+    {
+        _paused = false;
+        _exitRequested = false;
+        _doExitSequence = false;
+
+        _touchedTesseract = null;
+        _touchedChest = null;
+        _enemyTarget = null;
+    }
+
     void Awake()
     {
         _vectors = new Dictionary<Direction, Vector3>();
@@ -69,6 +85,12 @@ public class PlayerMovement : MonoBehaviour
 
     public IEnumerator Move()
     {
+        if (_paused)
+        {
+            yield return null;
+        }
+
+
         if (_direction == Direction.None)
         {
             yield return null;
@@ -133,9 +155,10 @@ public class PlayerMovement : MonoBehaviour
                     Destroy(_touchedTesseract);
                     _touchedTesseract = null;
                     _tesseracts++;
-                } else if (_exitRequested)
+                }
+                else if (_exitRequested)
                 {
-                    print("exit!");
+                    _doExitSequence = true;
                 }
             }
             else
@@ -160,6 +183,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (_paused)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             _direction = Direction.Up;

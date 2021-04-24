@@ -43,6 +43,15 @@ public class EnemyController : MonoBehaviour
         {
             Destroy(t.gameObject);
         }
+
+        foreach (var spawn in _spawners)
+        {
+            Destroy(spawn.gameObject);
+        }
+
+        _spawned.Clear();
+        _spawners.Clear();
+        _enemyMovements.Clear();
     }
 
     public void PlayerMoved(int x, int y)
