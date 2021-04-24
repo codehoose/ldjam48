@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.6.0" orientation="orthogonal" renderorder="left-down" width="16" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
+ <editorsettings>
+  <export target="../Deeper and Deeper/Assets/Resources/overworld-1.json" format="json"/>
+ </editorsettings>
+ <tileset firstgid="1" source="overworld.tsx"/>
+ <layer id="1" name="Tile Layer 1" width="16" height="9">
+  <data encoding="csv">
+0,0,0,0,0,2,2,2,2,2,2,2,2,0,0,0,
+0,0,0,0,2,1,1,1,1,1,1,1,1,2,0,0,
+0,0,0,0,2,1,1,1,1,1,1,1,1,2,0,0,
+0,0,0,0,2,1,1,1,1,1,1,1,1,1,2,0,
+0,0,0,2,1,1,1,1,1,1,1,1,1,1,2,0,
+0,0,2,1,1,1,1,1,1,1,1,1,1,1,2,0,
+0,0,2,1,1,1,2,2,2,2,1,1,1,1,2,0,
+0,0,0,2,2,2,0,0,0,0,2,2,2,2,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+</map>
