@@ -125,7 +125,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 // Tell the enemy controller - This will be used to spawn enemies
-                _enemyController.PlayerMoved();
+                _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
 
                 // Did we touch a tesseract?
                 if (_touchedTesseract != null)

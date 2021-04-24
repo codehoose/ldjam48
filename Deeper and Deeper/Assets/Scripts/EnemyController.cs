@@ -7,20 +7,26 @@ public class EnemyController : MonoBehaviour
     public Map _map;
     public GameObject _enemyPrefab;
     public GameObject _enemySpawnPrefab;
+
+    private List<EnemyMove> _enemyMovements;
     private List<GameObject> _spawned;
     private List<EnemySpawner> _spawners;
 
     private int _maxEnemies = 2;
     private int _playerMoveCount;
+    private AStar _astar;
 
     [Tooltip("The number of moves the player makes that causes new enemies to spawn")]
     [HideInInspector]
     private int _spawnAfterMoves = 5;
 
+
     void Awake()
     {
         _spawned = new List<GameObject>();
         _spawners = new List<EnemySpawner>();
+        _enemyMovements = new List<EnemyMove>();
+        _astar = new AStar(8, 8);
     }
 
     public void HitEnemy(GameObject enemy)
@@ -39,11 +45,30 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    public void PlayerMoved()
+    public void PlayerMoved(int x, int y)
     {
         _playerMoveCount++;
         UpdateSpawners();
         ShouldWeGenerateEnemy();
+
+        foreach (var enemy in _spawned)
+        {
+            if (enemy.activeInHierarchy)
+            {
+                var sx = (int)enemy.transform.position.x;
+                var sy = -(int)enemy.transform.position.y;
+
+                if (_astar.WalkToTarget(sx, sy, x, y, GetUsableBlocks()))
+                {
+                    print($"Passed: {_astar.Debug()}");
+                    _enemyMovements.Add(new EnemyMove(enemy, _astar.NextTile.X, _astar.NextTile.Y));
+                }
+                else
+                {
+                    print($"Failed: {_astar.Debug()}");
+                }
+            }
+        }
     }
 
     private void ShouldWeGenerateEnemy()
@@ -118,7 +143,23 @@ public class EnemyController : MonoBehaviour
 
     public IEnumerator Move()
     {
-        yield return null;
+        var _speed = 5;
+        
+        float time = 0;
+        while (time < 1f)
+        {
+            foreach (var em in _enemyMovements)
+            {
+                var start = em.GameObject.transform.position;
+                var target = new Vector3(em.X, -em.Y, 0);
+
+                em.GameObject.transform.position = Vector3.Lerp(start, target, time);
+            }
+            time += Time.deltaTime * _speed;
+            yield return null;
+        }
+
+        _enemyMovements.Clear();
     }
 
     private int[] GetUsableBlocks()
