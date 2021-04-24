@@ -50,6 +50,7 @@ public class MapGeneration : MonoBehaviour
 
         // The start and exit blocks
         map._start = startpos[Random.Range(0, 4)];
+        blocks[map._start] = BlockType.Walk;
 
         int exit;
         do
@@ -57,6 +58,7 @@ public class MapGeneration : MonoBehaviour
             exit = startpos[Random.Range(0, 4)];
         } while (exit == map._start || map._tesseracts.Contains(exit));
         map._exit = exit;
+        blocks[map._exit] = BlockType.Walk;
 
         map._blocks = blocks;
         return map;
