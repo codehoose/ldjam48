@@ -28,6 +28,14 @@ public class GameController : MonoBehaviour
 
     public CanvasGroup _quitPanel;
 
+    public CanvasGroup _gameOverPanel;
+
+    public TMPro.TextMeshProUGUI _gotToLevel;
+
+    public Button _yesPlayAgain;
+
+    public Button _quitToMenu;
+
     void Awake()
     {
         _yesQuit.onClick.AddListener(new UnityAction(() =>
@@ -40,6 +48,16 @@ public class GameController : MonoBehaviour
             _quitPanel.blocksRaycasts = false;
             _quitPanel.alpha = 0;
         }));
+
+        _yesPlayAgain.onClick.AddListener(new UnityAction(() =>
+        {
+            SceneManager.LoadScene("Game");
+        }));
+
+        _quitToMenu.onClick.AddListener(new UnityAction(() =>
+        {
+            SceneManager.LoadScene("MainMenu");
+        }));
     }
 
     IEnumerator Start()
@@ -51,6 +69,12 @@ public class GameController : MonoBehaviour
             yield return _playerMovement.Move();
             yield return _enemyController.Move();
 
+            if (_playerMovement._health == 0)
+            {
+                DoDeath();
+                yield return null;
+            }
+
             if (_playerMovement._doExitSequence)
             {
                 yield return ExitSequence();
@@ -61,6 +85,16 @@ public class GameController : MonoBehaviour
                 _tesseractUI[i].SetActive(i + 1 <= _playerMovement._tesseracts);
             }
         }
+    }
+
+    private void DoDeath()
+    {
+        _isRunning = false;
+        _playerMovement._paused = true;
+        _gotToLevel.text = $"You got to level {_level.text}. Play again?";
+        _gameOverPanel.blocksRaycasts = true;
+        _gameOverPanel.interactable = true;
+        _gameOverPanel.alpha = 1;
     }
 
     void Update()
@@ -91,6 +125,16 @@ public class GameController : MonoBehaviour
                 _quitPanel.alpha = 0;
                 _quitPanel.blocksRaycasts = false;
                 _playerMovement._paused = false;
+            }
+        } else if (_gameOverPanel.alpha == 1)
+        {
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                SceneManager.LoadScene("Game");
+            }
+            else if (Input.GetKeyDown(KeyCode.N))
+            {
+                SceneManager.LoadScene("MainMenu");
             }
         }
     }

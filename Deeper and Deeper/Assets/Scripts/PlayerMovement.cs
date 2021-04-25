@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class PlayerMovement : MonoBehaviour
     {
         None,
         Up,
-        Down,
+        Down,   
         Left,
         Right
     }
@@ -37,9 +38,14 @@ public class PlayerMovement : MonoBehaviour
     public bool _paused;
 
     [HideInInspector]
+    public int _health = 10;
+
+    [HideInInspector]
     public bool _doExitSequence;
 
     public int _grenades;
+
+    public Image _healthMeter;
 
     public TMPro.TextMeshProUGUI _grenadeIndicator;
 
@@ -106,7 +112,7 @@ public class PlayerMovement : MonoBehaviour
             _enemyTarget = null;
 
             // Even if the player is firing, the other enemies can move...
-            _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
+            _enemyController.PlayerMoved(this);
         }
         else
         {
@@ -167,25 +173,24 @@ public class PlayerMovement : MonoBehaviour
             }
             else
             {
-                float shimmyTime = 0f;
-                var pos = transform.position;
-                while (shimmyTime < 1f)
-                {
-                    transform.position = pos + Shimmy();
-                    shimmyTime += Time.deltaTime * 10f;
-                    yield return null;
-                }
-
-                transform.localPosition = Vector3.zero;
+                yield return DoTheShimmy();
             }
 
             // Tell the enemy controller - This will be used to spawn enemies
-            _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
+            _enemyController.PlayerMoved(this);
 
             // Set to new position to make sure it's 100% on cell and reset direction
             transform.position = target;
             _direction = Direction.None;
         }
+    }
+
+    public void TakeHit(int hits)
+    {
+        StartCoroutine(DoTheShimmy());
+        _health -= hits;
+        _health = Mathf.Max(0, _health);
+        _healthMeter.fillAmount = _health / 10f;
     }
 
     void Update()
@@ -242,6 +247,22 @@ public class PlayerMovement : MonoBehaviour
         }
 
         return false;
+    }
+
+
+    private IEnumerator DoTheShimmy()
+    {
+        float shimmyTime = 0f;
+        var pos = transform.position;
+        while (shimmyTime < 1f)
+        {
+            transform.position = pos + Shimmy();
+            shimmyTime += Time.deltaTime * 10f;
+            yield return null;
+        }
+
+        transform.localPosition = Vector3.zero;
+        transform.position = pos;
     }
 
     private Vector3 Shimmy()

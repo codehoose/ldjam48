@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -33,6 +34,17 @@ public class EnemyController : MonoBehaviour
         _astar = new AStar(8, 8);
     }
 
+    // Calculate the number of enemies near the player in the cardinal NSEW directions only
+    public int EnemiesNearPlayer(Vector3 pos)
+    {
+        return _spawned.Select(go => go.transform.position)
+                       .Where(p => p + Vector3.up == pos ||
+                              p + Vector3.down == pos ||
+                              p + Vector3.left == pos ||
+                              p + Vector3.right == pos)
+                       .Count();
+    }
+
     public void HitEnemy(GameObject enemy)
     {
         if (enemy.GetComponent<Enemy>().TakeHit())
@@ -63,11 +75,14 @@ public class EnemyController : MonoBehaviour
         _enemyMovements.Clear();
     }
 
-    public void PlayerMoved(int x, int y)
+    public void PlayerMoved(PlayerMovement player)
     {
         _playerMoveCount++;
         UpdateSpawners();
         ShouldWeGenerateEnemy();
+
+        var x = Mathf.RoundToInt(player.transform.position.x);
+        var y = -Mathf.RoundToInt(player.transform.position.y);
 
         foreach (var enemy in _spawned)
         {
@@ -81,6 +96,12 @@ public class EnemyController : MonoBehaviour
                     _enemyMovements.Add(new EnemyMove(enemy, _astar.NextTile.X, _astar.NextTile.Y));
                 }
             }
+        }
+
+        var enemiesNearPlayer = EnemiesNearPlayer(new Vector3(x, -y, 0));
+        if (enemiesNearPlayer > 0)
+        {
+            player.TakeHit(enemiesNearPlayer);
         }
     }
 
