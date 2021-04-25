@@ -1,5 +1,8 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -19,6 +22,26 @@ public class GameController : MonoBehaviour
 
     public GameObject[] _tesseractUI;
 
+    public Button _yesQuit;
+
+    public Button _noStay;
+
+    public CanvasGroup _quitPanel;
+
+    void Awake()
+    {
+        _yesQuit.onClick.AddListener(new UnityAction(() =>
+        {
+            SceneManager.LoadScene("MainMenu");
+        }));
+
+        _noStay.onClick.AddListener(new UnityAction(() =>
+        {
+            _quitPanel.blocksRaycasts = false;
+            _quitPanel.alpha = 0;
+        }));
+    }
+
     IEnumerator Start()
     {
         InitSequence();
@@ -36,6 +59,38 @@ public class GameController : MonoBehaviour
             for (int i = 0; i < _tesseractUI.Length; i++)
             {
                 _tesseractUI[i].SetActive(i + 1 <= _playerMovement._tesseracts);
+            }
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (_quitPanel.alpha == 0)
+            {
+                _quitPanel.alpha = 1;
+                _quitPanel.blocksRaycasts = true;
+                _playerMovement._paused = true;
+            }
+            else
+            {
+                _quitPanel.alpha = 0;
+                _quitPanel.blocksRaycasts = false;
+                _playerMovement._paused = false;
+            }
+        }
+        else if (_quitPanel.alpha == 1)
+        {
+            if (Input.GetKeyDown(KeyCode.Y))
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
+            else if (Input.GetKeyDown(KeyCode.N))
+            {
+                _quitPanel.alpha = 0;
+                _quitPanel.blocksRaycasts = false;
+                _playerMovement._paused = false;
             }
         }
     }
