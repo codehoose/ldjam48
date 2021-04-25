@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
 
     public float _speed = 5f;
 
+    public bool _godMode = false;
+
     [HideInInspector]
     public BlockType[] _collisions;
 
@@ -188,6 +190,8 @@ public class PlayerMovement : MonoBehaviour
     public void TakeHit(int hits)
     {
         StartCoroutine(DoTheShimmy());
+
+        if (_godMode) return;
         _health -= hits;
         _health = Mathf.Max(0, _health);
         _healthMeter.fillAmount = _health / 10f;
@@ -253,7 +257,7 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator DoTheShimmy()
     {
         float shimmyTime = 0f;
-        var pos = transform.position;
+        var pos = Clamp();
         while (shimmyTime < 1f)
         {
             transform.position = pos + Shimmy();
@@ -263,6 +267,13 @@ public class PlayerMovement : MonoBehaviour
 
         transform.localPosition = Vector3.zero;
         transform.position = pos;
+    }
+
+    private Vector3 Clamp()
+    {
+        var x = Mathf.RoundToInt(transform.position.x);
+        var y = Mathf.RoundToInt(transform.position.y);
+        return new Vector3(x, y, 0);
     }
 
     private Vector3 Shimmy()
