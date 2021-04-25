@@ -39,6 +39,10 @@ public class PlayerMovement : MonoBehaviour
     [HideInInspector]
     public bool _doExitSequence;
 
+    public int _grenades;
+
+    public TMPro.TextMeshProUGUI _grenadeIndicator;
+
     public void Reset()
     {
         _paused = false;
@@ -209,7 +213,8 @@ public class PlayerMovement : MonoBehaviour
         } else if (Input.GetKeyDown(KeyCode.Space) && _touchedChest != null && _tesseracts > 0)
         {
             _tesseracts--;
-            _touchedChest.GetComponent<Chest>().OpenChest();
+            _grenades += _touchedChest.GetComponent<Chest>().OpenChest();
+            _grenadeIndicator.text = _grenades.ToString();
             _touchedChest = null;
         }
     }
