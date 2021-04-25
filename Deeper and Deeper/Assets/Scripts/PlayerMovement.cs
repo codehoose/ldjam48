@@ -98,9 +98,11 @@ public class PlayerMovement : MonoBehaviour
         else if (EnemyInSight())
         {
             _direction = Direction.None;
-            // TODO: Firing
             _enemyController.HitEnemy(_enemyTarget);
             _enemyTarget = null;
+
+            // Even if the player is firing, the other enemies can move...
+            _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
         }
         else
         {
@@ -207,7 +209,8 @@ public class PlayerMovement : MonoBehaviour
         } else if (Input.GetKeyDown(KeyCode.Space) && _touchedChest != null && _tesseracts > 0)
         {
             _tesseracts--;
-            print($"{_tesseracts} left");
+            _touchedChest.GetComponent<Chest>().OpenChest();
+            _touchedChest = null;
         }
     }
 

@@ -8,8 +8,6 @@ using UnityEngine;
 /// </summary>
 public class AStar
 {
-    private static int STAR = 99;
-
     private int[] _map;
     private int _width;
     private int _height;
@@ -55,19 +53,19 @@ public class AStar
         {
             var checkTile = activeTiles.OrderBy(x => x.CostDistance).First();
 
-            if (checkTile.X == finish.X && checkTile.Y == finish.Y)
+            if (checkTile != null && checkTile.X == finish.X && checkTile.Y == finish.Y)
             {
                 // Walk back through the tiles to the tile AFTER the start.
                 // That's going to be our next tile
                 var tile = checkTile;
-                while (tile.Parent != start)
+                while (tile?.Parent != null && tile?.Parent != start)
                 {
-                    tile = tile.Parent;
+                    tile = tile?.Parent;
                 }
 
                 NextTile = tile;
-                return true;
-
+                // Only return true if we have a tile and it's NOT the player's tile
+                return NextTile != null && NextTile.X != fx && NextTile.Y != fy;
             }
 
             visitedTiles.Add(checkTile);

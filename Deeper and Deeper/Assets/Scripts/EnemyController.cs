@@ -11,6 +11,7 @@ public class EnemyController : MonoBehaviour
     private List<EnemyMove> _enemyMovements;
     private List<GameObject> _spawned;
     private List<EnemySpawner> _spawners;
+    private List<GameObject> _stunnedEnemies;
 
     [HideInInspector]
     public int _maxEnemiesAtStart = 2;
@@ -28,6 +29,7 @@ public class EnemyController : MonoBehaviour
         _spawned = new List<GameObject>();
         _spawners = new List<EnemySpawner>();
         _enemyMovements = new List<EnemyMove>();
+        _stunnedEnemies = new List<GameObject>();
         _astar = new AStar(8, 8);
     }
 
@@ -36,6 +38,11 @@ public class EnemyController : MonoBehaviour
         if (enemy.GetComponent<Enemy>().TakeHit())
         {
             _spawned.Remove(enemy);
+        }
+        else
+        {
+            if (!_stunnedEnemies.Contains(enemy))
+                _stunnedEnemies.Add(enemy);
         }
     }
 
@@ -71,12 +78,7 @@ public class EnemyController : MonoBehaviour
 
                 if (_astar.WalkToTarget(sx, sy, x, y, GetUsableBlocks()))
                 {
-                    print($"Passed: {_astar.Debug()}");
                     _enemyMovements.Add(new EnemyMove(enemy, _astar.NextTile.X, _astar.NextTile.Y));
-                }
-                else
-                {
-                    print($"Failed: {_astar.Debug()}");
                 }
             }
         }
@@ -161,6 +163,12 @@ public class EnemyController : MonoBehaviour
         {
             foreach (var em in _enemyMovements)
             {
+                if (_stunnedEnemies.Contains(em.GameObject))
+                {
+                    // Don't move stunned enemies
+                    continue;
+                }
+
                 var start = em.GameObject.transform.position;
                 var target = new Vector3(em.X, -em.Y, 0);
 
@@ -169,6 +177,9 @@ public class EnemyController : MonoBehaviour
             time += Time.deltaTime * _speed;
             yield return null;
         }
+
+        // Stunned enemies are only stunned when they're shot
+        _stunnedEnemies.Clear();
 
         _enemyMovements.Clear();
     }
