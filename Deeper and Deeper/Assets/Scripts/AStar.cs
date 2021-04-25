@@ -57,10 +57,17 @@ public class AStar
 
             if (checkTile.X == finish.X && checkTile.Y == finish.Y)
             {
-                NextTile = activeTiles.Where(x=> x.Cost == 1)
-                                       .OrderBy(x => x.CostDistance)
-                                       .LastOrDefault();
-                return true && NextTile != null;
+                // Walk back through the tiles to the tile AFTER the start.
+                // That's going to be our next tile
+                var tile = checkTile;
+                while (tile.Parent != start)
+                {
+                    tile = tile.Parent;
+                }
+
+                NextTile = tile;
+                return true;
+
             }
 
             visitedTiles.Add(checkTile);

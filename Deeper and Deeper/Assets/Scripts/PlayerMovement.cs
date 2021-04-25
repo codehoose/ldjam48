@@ -146,9 +146,6 @@ public class PlayerMovement : MonoBehaviour
                     yield return null;
                 }
 
-                // Tell the enemy controller - This will be used to spawn enemies
-                _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
-
                 // Did we touch a tesseract?
                 if (_touchedTesseract != null)
                 {
@@ -175,6 +172,9 @@ public class PlayerMovement : MonoBehaviour
 
                 transform.localPosition = Vector3.zero;
             }
+
+            // Tell the enemy controller - This will be used to spawn enemies
+            _enemyController.PlayerMoved((int)transform.position.x, (int)-transform.position.y);
 
             // Set to new position to make sure it's 100% on cell and reset direction
             transform.position = target;
